@@ -27,6 +27,14 @@ resource "aws_instance" "nginx-server" {
   vpc_security_group_ids = [
     aws_security_group.nginx-server-sg.id
   ]
+
+  tags = {
+    Name        = "nginx-server"
+    Environment = "test"
+    Owner       = "sa.bravo0901@gmail.com"
+    Team        = "DevOps"
+    Project     = "webinar-terraform"
+  }
 }
 
 # ssh
@@ -34,6 +42,14 @@ resource "aws_instance" "nginx-server" {
 resource "aws_key_pair" "nginx-server-ssh" {
   key_name   = "nginx-server-ssh"
   public_key = file("nginx-server.key.pub")
+
+  tags = {
+    Name        = "nginx-server-ssh"
+    Environment = "test"
+    Owner       = "sa.bravo0901@gmail.com"
+    Team        = "DevOps"
+    Project     = "webinar-terraform"
+  }
 }
 
 # Security Group #
@@ -61,4 +77,23 @@ resource "aws_security_group" "nginx-server-sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name        = "nginx-server-sg"
+    Environment = "test"
+    Owner       = "sa.bravo0901@gmail.com"
+    Team        = "DevOps"
+    Project     = "webinar-terraform"
+  }
+}
+
+# output #
+output "server_public_ip" {
+  description = "Direccion IP publica de la instancia EC2"
+  value       = aws_instance.nginx-server.public_ip
+}
+
+output "server_public_dns" {
+  description = "DNS publico de la instancia EC2"
+  value       = aws_instance.nginx-server.public_dns
 }
