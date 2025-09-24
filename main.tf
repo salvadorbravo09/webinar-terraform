@@ -1,3 +1,24 @@
+# variables #
+variable "ami_id" {
+  description = "ID de la AMI para la instancia EC2"
+  default     = "ami-082daca2e7d60abda" # Amazon Linux 2 en sa-east-1
+}
+
+variable "instance_type" {
+  description = "Tipo de instancia EC2"
+  default     = "t3.micro"
+}
+
+variable "server_name" {
+  description = "Nombre del servidor web"
+  default     = "nginx-server"
+}
+
+variable "environment" {
+  description = "Ambiente de la aplicacion"
+  default     = "test"
+}
+
 # ============================================================================
 # CONFIGURACION DEL PROVEEDOR AWS
 #============================================================================
@@ -11,8 +32,8 @@ provider "aws" {
 # ============================================================================
 # Crea una instancia EC2 que funcionara como servidor web con Nginx
 resource "aws_instance" "nginx-server" {
-  ami           = "ami-082daca2e7d60abda"
-  instance_type = "t3.micro"
+  ami           = var.ami_id
+  instance_type = var.instance_type
 
   # Script de inicializacion que se ejecuta al arrancar la instancia
   user_data = <<-EOF
@@ -29,8 +50,8 @@ resource "aws_instance" "nginx-server" {
   ]
 
   tags = {
-    Name        = "nginx-server"
-    Environment = "test"
+    Name        = var.server_name
+    Environment = var.environment
     Owner       = "sa.bravo0901@gmail.com"
     Team        = "DevOps"
     Project     = "webinar-terraform"
@@ -40,12 +61,12 @@ resource "aws_instance" "nginx-server" {
 # ssh
 # ssh-keygen -t rsa -b 2048 -f "nginx-server.key"
 resource "aws_key_pair" "nginx-server-ssh" {
-  key_name   = "nginx-server-ssh"
-  public_key = file("nginx-server.key.pub")
+  key_name   = "${var.server_name}-ssh"
+  public_key = file("${var.server_name}.key.pub")
 
   tags = {
-    Name        = "nginx-server-ssh"
-    Environment = "test"
+    Name        = "${var.server_name}-ssh"
+    Environment = "${var.environment}"
     Owner       = "sa.bravo0901@gmail.com"
     Team        = "DevOps"
     Project     = "webinar-terraform"
@@ -54,7 +75,7 @@ resource "aws_key_pair" "nginx-server-ssh" {
 
 # Security Group #
 resource "aws_security_group" "nginx-server-sg" {
-  name        = "nginx-server-sg"
+  name        = "${var.server_name}-sg"
   description = "Security group allowing SSH and HTTP access"
 
   ingress {
@@ -79,8 +100,8 @@ resource "aws_security_group" "nginx-server-sg" {
   }
 
   tags = {
-    Name        = "nginx-server-sg"
-    Environment = "test"
+    Name        = "${var.server_name}-sg"
+    Environment = "${var.environment}"
     Owner       = "sa.bravo0901@gmail.com"
     Team        = "DevOps"
     Project     = "webinar-terraform"
