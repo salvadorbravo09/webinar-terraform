@@ -46,3 +46,21 @@ output "nginx_qa_dns" {
   description = "DNS publico de la instancia EC2"
   value       = module.nginx_server_qa.server_public_dns
 }
+
+# import #
+resource "aws_instance" "server-web" {
+  ami           = "ami-082daca2e7d60abda"
+  instance_type = "t3.micro"
+
+  tags = {
+    Name        = "server-web"
+    Environment = "test"
+    Owner       = "sa.bravo0901@gmail.com"
+    Team        = "DevOps"
+    Project     = "webinar-terraform"
+  }
+
+  vpc_security_group_ids = [
+    "sg-09f8670f244fb046e",
+  ]
+}
